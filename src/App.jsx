@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Search from './components/Search'
 import Spinner from './components/Spinner'
 import MovieCard from './components/MovieCard'
-import { updateSearchCount } from './appwrite'
+import { updateSearchCount, getTrendingMovies } from './appwrite'
 import { useDebounce } from 'react-use'
 
 
@@ -22,6 +22,8 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const [movieList, setMovieList] = useState([])
   const [isLoading, setLoading] = useState(false)
+  const [trendingMovies, setTrendingMovies] = useState([])
+
   useDebounce(() => setDebounceSearchTerm(searchTerm), 500, [searchTerm])
 
   const fetchMovies = async (query = "") => {
@@ -61,6 +63,19 @@ const App = () => {
     }
   }
 
+  const loadTrendingMovies = async () => {
+    try {
+      const movies = await getTrendingMovies()
+      console.log(movies);
+
+      setTrendingMovies(movies)
+    }
+    catch (error) {
+      console.error(error);
+
+    }
+
+  }
 
   useEffect(() => {
 
@@ -68,6 +83,11 @@ const App = () => {
 
   }
     , [debounceSearchTerm])
+
+  useEffect(() => {
+    loadTrendingMovies()
+  }, [])
+
 
 
   return (
@@ -81,6 +101,23 @@ const App = () => {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         </header>
+
+        {trendingMovies.length > 0 && (
+          <section className='trending'
+          >
+            <h2>Trending Movies</h2>
+            <ul>
+              {trendingMovies.map((movie, index) =>
+                <li key={movie.$id}>
+                  <p>{index + 1}</p>
+                  <img src={movie.poster_url} alt={movie.title} />
+                </li>
+              )
+              }
+            </ul>
+          </section>
+
+        )}
 
         <section className='all-movies'>
           <h2 className='mt-[40px]'>All Movies</h2>
@@ -101,11 +138,7 @@ const App = () => {
           }
 
         </section>
-
       </div>
-
-
-
     </main>
 
   )
