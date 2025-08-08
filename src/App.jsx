@@ -41,7 +41,6 @@ const App = () => {
 
       const data = await response.json()
 
-
       if (data.Response === 'False') {
         setErrorMessage(data.Error || "Failed to fetch movies")
         setMovieList([])
@@ -110,7 +109,7 @@ const App = () => {
               {trendingMovies.map((movie, index) =>
                 <li key={movie.$id}>
                   <p>{index + 1}</p>
-                  <img src={movie.poster_url} alt={movie.title} />
+                  <img src={movie.poster_url} alt={movie.title} onError={(e) => (e.target.src = "no-movie.png")} />
                 </li>
               )
               }
